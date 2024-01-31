@@ -1,0 +1,326 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include <cassert>
+#include <Windows.h>
+using namespace std;
+class Person
+{
+protected:
+	string* _name;
+	string* _surname;
+	string* _workAddress;
+	string* _liveAddress;
+	string* _phoneNumber;
+	double _salary;
+	Person()
+	{
+		_name = nullptr;
+		_surname = nullptr;
+		_workAddress = nullptr;
+		_liveAddress = nullptr;
+		_phoneNumber = nullptr;
+		_salary = NULL;
+	}
+	Person(string name, string surname, string WAddress, string LAddress, string Number, double salary) :Person()
+	{
+		SetName(name);
+		SetSurname(surname);
+		SetWorkAddress(WAddress);
+		SetLiveAdress(LAddress);
+		SetPhoneNumber(Number);
+		SetSalary(salary);
+	}
+	Person(const Person& other)
+	{
+		SetName(*(other._name));
+		SetLiveAdress(*other._liveAddress);
+		SetPhoneNumber(*other._phoneNumber);
+		SetSalary(other._salary);
+		SetSurname(*other._surname);
+	}
+	Person& operator= (const Person& other)
+	{
+		SetName(*(other._name));
+		SetLiveAdress(*other._liveAddress);
+		SetPhoneNumber(*other._phoneNumber);
+		SetSalary(other._salary);
+		SetSurname(*other._surname);
+		return *this;
+	}
+public:
+	virtual bool isEmployee() = 0;
+	virtual double GetDebt() { return 0; }
+	~Person()
+	{
+		if (_name != nullptr)
+			delete _name;
+		if (_surname != nullptr)
+			delete _surname;
+		if (_workAddress != nullptr)
+			delete _workAddress;
+		if (_liveAddress != nullptr)
+			delete _liveAddress;
+		if (_phoneNumber != nullptr)
+			delete _phoneNumber;
+		_name, _surname, _workAddress, _liveAddress, _phoneNumber = nullptr;
+	}
+
+	void SetName(string name)
+	{
+		if (name.length() < 2 || name.length() > 16)
+			assert(!"Name is Wromg");
+		if (_name != nullptr)
+			delete _name;
+		_name = new string(name);
+	}
+	void SetSurname(string surname)
+	{
+		if (surname.length() < 2 || surname.length() > 16)
+			assert(!"surname is Wromg");
+		if (_surname != nullptr)
+			delete _surname;
+		_surname = new string(surname);
+	}
+	void SetWorkAddress(string Address)
+	{
+		if (Address.length() < 5 || Address.length() > 30)
+			assert(!"WorkAddress is Wromg");
+		if (_workAddress != nullptr)
+			delete _workAddress;
+		_workAddress = new string(Address);
+	}
+	void SetLiveAdress(string Address)
+	{
+		if (Address.length() < 5 || Address.length() > 30)
+			assert(!"LiveAddress is Wromg");
+		if (_liveAddress != nullptr)
+			delete _liveAddress;
+		_liveAddress = new string(Address);
+	}
+	void SetPhoneNumber(string Number)
+	{
+		if (Number.length() < 9 || Number.length() > 30)
+			assert(!"LiveAddress is Wromg");
+		if (_phoneNumber != nullptr)
+			delete _phoneNumber;
+		_phoneNumber = new string(Number);
+	}
+	void SetSalary(double salary)
+	{
+		if (salary < 100 || salary > 789)
+			assert(!"Salary is Wrong");
+		_salary = salary;
+	}
+
+	string* GetName() { return _name; }
+	string* GetSurname() { return _surname; }
+	string* GetWorkAddress() { return _workAddress; }
+	string* GetLiveAddress() { return _liveAddress; }
+	string* GetPhoneNumber() { return _phoneNumber; }
+	double GetSalary() { return _salary; }
+
+	void Print()
+	{
+		cout << endl;
+		cout << "Name: " << (_name ? *_name : NULL) << endl;
+		cout << "Surname: " << (_surname ? *_surname : NULL) << endl;
+		cout << "WorkAddress: " << (_workAddress ? *_workAddress : NULL) << endl;
+		cout << "LiveAddress: " << (_liveAddress ? *_liveAddress : NULL) << endl;
+		cout << "Phone Number: " << (_phoneNumber ? *_phoneNumber : NULL) << endl;
+		cout << "Salary: " << _salary << endl;
+	}
+
+
+};
+
+class Debtor : public Person
+{
+protected:
+	int _id;
+	bool _hasLatePayment;
+	double _debt;
+	static int _staticId;
+public:
+	Debtor()
+	{
+		_id = _staticId++;
+		_hasLatePayment = NULL;
+		_debt = NULL;
+	}
+	Debtor(bool Payment, double debt, string name, string surname, string WAddress, string LAddress, string Number, double salary) :
+		Person(name,surname,WAddress,LAddress,Number,salary)
+	{
+		SetDebt(debt);
+		_hasLatePayment = Payment;
+		_id = _staticId++;
+	}
+	Debtor(const Debtor& other) :Person(other)
+	{
+		SetDebt(other._debt);
+		_hasLatePayment = other._hasLatePayment;
+	}
+	bool isEmployee() { return false; }
+
+	bool GetHasLatePayment() { return _hasLatePayment; }
+	double GetDebt() { return _debt; }
+	int GetId() { return _id; }
+
+	void SetDebt(double debt)
+	{
+		if (debt < 50 || debt > 1000)
+			assert(!"Debt is Wrong");
+		_debt = debt;
+	}
+
+	void Print()
+	{
+		cout << "Id: " << _id << endl;
+		Person::Print();
+		cout << boolalpha;
+		cout << "HasLatePayment: " << _hasLatePayment << endl;
+		cout << "Debt: " << _debt << endl;
+	}
+	int calculateTaxes(int isiq, int qaz, int su, int internet)
+	{
+		return su + internet + isiq + qaz + _debt;
+	}
+};
+int Debtor::_staticId = 1;
+
+class Employee : public Person
+{
+protected:
+	int _id;
+	static int _staticId;
+	bool _hasComputer;
+	bool _hasCar;
+public:
+
+	Employee()
+	{
+		_id = _staticId++;
+		_hasComputer = NULL;
+		_hasCar = NULL;
+	}
+	Employee(bool HasComp, bool HasCar, string name, string surname, string WAddress, string LAddress, string Number, double salary) :
+		Person(name, surname, WAddress, LAddress, Number, salary)
+	{
+		_hasComputer = HasComp;
+		_hasCar = HasCar;
+		_id = _staticId++;
+	}
+	Employee(const Employee& other) :Person(other)
+	{
+		_hasComputer = other._hasComputer;
+		_hasCar = other._hasCar;
+	}
+	bool isEmployee() { return true; }
+	bool GetHasComputer() { return _hasComputer; }
+	bool GetHasCar() { return _hasCar; }
+	int GetID() { return _id; }
+
+
+	void Print()
+	{
+		cout << "Id: " << _id << endl;
+		Person::Print();
+		cout << "HasComp: " << _hasComputer << endl;
+		cout << "HasCar: " << _hasCar << endl;
+	}
+	int calculateTaxes(int isiq, int qaz, int su, int internet)
+	{
+		return su + internet + isiq + qaz;
+	}
+	int XalisPul()
+	{
+		return _salary - calculateTaxes(12, 13, 14, 16);
+	}
+};
+int Employee::_staticId = 1;
+
+class Bank :public Person
+{
+private:
+	string* _name;
+	vector<Person*>* _persons;
+public:
+	Bank()
+	{
+		_persons = nullptr;
+		_name = nullptr;
+	}
+	Bank(string name, vector<Person*>* persons)
+	{
+		SetName(name);
+		_persons = persons;
+	}
+	~Bank()
+	{
+		if (_name != nullptr)
+			delete _name;
+		if (_persons != nullptr)
+			delete _persons;
+	}
+	void SetName(string name)
+	{
+		if (name.length() < 2 || name.length() > 16)
+			assert(!"Name is Wromg");
+		if (_name != nullptr)
+			delete _name;
+		_name = new string(name);
+	}
+	string* GetName() { return _name; }
+	vector<Person*>* GetPerson() { return _persons; }
+
+	void printAllDebtors()
+	{
+		for (size_t i = 0; i < _persons->size(); i++)
+		{
+			if (!((*_persons)[i]->isEmployee()))
+			(*_persons).at(i)->Print();
+		}
+	}
+	void printDebtorsDebtGreaterThan(double debt)
+	{
+
+		for (size_t i = 0; i < _persons->size(); i++)
+		{
+			if (!((*_persons)[i]->isEmployee()) && (*_persons)[i]->GetDebt() > debt)
+				(*_persons)[i]->Print();
+		}
+
+	}
+
+	void printDebtorsWithDelays()
+	{
+		for (size_t i = 0; i < _persons->size(); i++)
+		{
+			if (!((*_persons)[i]->isEmployee()))
+			{
+				(*_persons)[i]->Print();
+				Sleep(1000);
+			}
+		}
+	}
+	bool isEmployee() { return true; }
+};
+int main()
+{
+	Employee e1(true, true, "Ibrahim", "Talibli", "asjbfb", "aibfsbf", "0516078921", 167);
+	Employee e2(true, true, "Ibrahim", "Talibli", "asjbfb", "aibfsbf", "0516078921", 167);
+	Debtor d1(true, 178, "Bilal", "Talibli", "sbdbsj", "isadbfhbsdf", "2991309302", 677);
+
+	
+	vector<Person*>* persons = new vector<Person*>();
+	persons->push_back(new Employee(true, true, "Ibrahim", "Talibli", "asjbfb", "aibfsbf", "0516078921", 167));
+	persons->push_back(new Employee(true, true, "Ibrahim", "Talibli", "asjbfb", "aibfsbf", "0516078921", 167));
+	persons->push_back(new Employee(true, true, "Ibrahim", "Talibli", "asjbfb", "aibfsbf", "0516078921", 167));
+	persons->push_back(new Debtor(true, 178, "Bilal", "Talibli", "sbdbsj", "isadbfhbsdf", "2991309302", 500));
+	persons->push_back(new Debtor(true, 99, "Bilal", "Talibli", "sbdbsj", "isadbfhbsdf", "2991309302", 600));
+	persons->push_back(new Debtor(true, 178, "Bilal", "Talibli", "sbdbsj", "isadbfhbsdf", "2991309302", 650));
+
+	Bank a("Apple", persons);
+	a.printDebtorsWithDelays();
+}
+
